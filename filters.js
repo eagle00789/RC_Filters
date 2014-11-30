@@ -3,7 +3,7 @@
  *
  * Plugin that adds a new tab to the settings section to create client-side e-mail filtering.
  *
- * @version 2.1.4
+ * @version 2.1.5
  * @author Roberto Zarrelli <zarrelli@unimol.it>
  * @author Chris Simon <info@decomputeur.nl> from version 2.1.3
  */

@@ -3,7 +3,7 @@
  *
  * Plugin that adds a new tab to the settings section to create client-side e-mail filtering.
  *
- * @version 2.1.4
+ * @version 2.1.5
  * @author Roberto Zarrelli <zarrelli@unimol.it>
  * @author Chris Simon <info@decomputeur.nl> from version 2.1.3
  *  
@@ -58,3 +58,5 @@ History
   - Added a notification when the plugin caused 1 or more messages to be moved,
 2.1.4:
   - Make use of some internal structures from roundcube for a config file to keep the plugin compatible with new versions of roundcube
+2.1.5:
+  - Added the first hints of a per filter case sensitivity switch
