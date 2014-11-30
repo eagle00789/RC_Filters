@@ -85,7 +85,7 @@ class filters extends rcube_plugin{
         }                          
         if (count($uids)){                    
 				  $imap->move_message($uids, $dfolder, $open_mbox);
-				  $this->rc->output->show_message($this->gettext('msg_moved_by_rule'), 'confirmation');
+				  $this->rc->output->show_message(count($uids)." ".$this->gettext('msg_moved_by_rule'), 'confirmation');
         }                                  
       }            
       // refresh      
