@@ -10,7 +10,6 @@
  * @author Chris Simon <info@decomputeur.nl> from version 2.1.3
  *   
  */
-
  
 class filters extends rcube_plugin{
 
