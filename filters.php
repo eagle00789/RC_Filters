@@ -25,9 +25,10 @@ class filters extends rcube_plugin{
     $this->rc = rcmail::get_instance();	
 	$this->load_config('config.inc.php.dist');
 	$this->load_config('config.inc.php');
-       
-		if($this->rc->task == 'mail')           		  
-			$this->add_hook('messages_list', array($this, 'filters_checkmsg'));		
+    $this->add_texts('localization/');
+
+	if($this->rc->task == 'mail')           		  
+		$this->add_hook('messages_list', array($this, 'filters_checkmsg'));		
     else if ($this->rc->task == 'settings'){
         $this->register_action('plugin.filters', array($this, 'filters_init'));
         $this->register_action('plugin.filters-save', array($this, 'filters_save'));
@@ -37,13 +38,12 @@ class filters extends rcube_plugin{
         $this->include_script('filters.js');      
     }
     else if ($this->rc->task == 'login'){
-      if ($this->rc->config->get('autoAddSpamFilterRule', true))
-        $this->add_hook('login_after', array($this, 'filters_addMoveSpamRule'));
+		if ($this->rc->config->get('autoAddSpamFilterRule', true))
+			$this->add_hook('login_after', array($this, 'filters_addMoveSpamRule'));
     }
   }  
     
   function filters_checkmsg($mlist){
-		$this->add_texts('localization/');
 		$user = $this->rc->user;
 		$imap = $this->rc->imap;
 		$open_mbox = $imap->get_mailbox_name();								
@@ -98,22 +98,14 @@ class filters extends rcube_plugin{
             			
   }
   
-
-  function filters_init(){    
-    $this->add_texts('localization/');
-    $this->register_handler('plugin.body', array($this, 'filters_form'));    
-    $this->rc->output->set_pagetitle($this->gettext('filters'));
-    $this->rc->output->send('plugin');    
-  }    
-  
   function filters_save(){
     $user = $this->rc->user;
-  
-    $this->add_texts('localization/');
+
     $this->register_handler('plugin.body', array($this, 'filters_form'));
     $this->rc->output->set_pagetitle($this->gettext('filters'));
     
     $searchstring = trim(get_input_value('_searchstring', RCUBE_INPUT_POST, true));
+	$casesensitive =  trim(get_input_value('_casesensitive', RCUBE_INPUT_POST, true));
     $destfolder = trim(get_input_value('_folders', RCUBE_INPUT_POST, true));
     $whatfilter = trim(get_input_value('_whatfilter', RCUBE_INPUT_POST, true));
     $messages = trim(get_input_value('_messages', RCUBE_INPUT_POST, true));
@@ -123,6 +115,7 @@ class filters extends rcube_plugin{
     else{    
       $new_arr['whatfilter'] = $whatfilter;
       $new_arr['searchstring'] = htmlentities($searchstring);
+	  $new_arr['casesensitive'] = $casesensitive;
       $new_arr['destfolder'] = $destfolder; 
       $new_arr['messages'] = $messages;     
       $arr_prefs = $user->get_prefs();                    
@@ -139,7 +132,6 @@ class filters extends rcube_plugin{
   function filters_delete(){
     $user = $this->rc->user;
 
-    $this->add_texts('localization/');
     $this->register_handler('plugin.body', array($this, 'filters_form'));
     $this->rc->output->set_pagetitle($this->gettext('filters'));
     
@@ -157,29 +149,41 @@ class filters extends rcube_plugin{
     rcmail_overwrite_action('plugin.filters');
     $this->rc->output->send('plugin');      
   }    
-      
 
+  function filters_init(){    
+    $this->register_handler('plugin.body', array($this, 'filters_form'));    
+    $this->rc->output->set_pagetitle($this->gettext('filters'));
+    $this->rc->output->send('plugin');    
+  }    
+  
   function filters_form(){
         		    
     $this->rc->imap_connect();
   
-    $table = new html_table(array('cols' => 2));
+    $table = new html_table(array('cols' => 4));
+	
     $table->add('title', Q($this->gettext('whatfilter').":"));
-    
     $select = new html_select(array('name' => '_whatfilter', 'id' => 'whatfilter'));
     $select->add($this->gettext('from'), 'from');
     $select->add($this->gettext('to'), 'to');        
     $select->add($this->gettext('cc'), 'cc');
     $select->add($this->gettext('subject'), 'subject');
     $table->add('', $select->show($this->gettext('from')));
-        
+    $table->add_row();
+
     $table->add('title', Q($this->gettext('searchstring').":"));
     $inputfield = new html_inputfield(array('name' => '_searchstring', 'id' => 'searchstring'));
     $table->add('', $inputfield->show(""));
+    $table->add('title', Q($this->gettext('casesensitive').":"));
+	$checkbox = new html_checkbox(array('name' => '_casesensitive', 'id' => 'casesensitive', 'value' => '1'));
+	$casesensitive = $this->rc->config->get('caseInsensitiveSearch', true);
+	$table->add('', $checkbox->show(($casesensitive ? 1 : 0)));
+    $table->add_row();
     
     $table->add('title', Q($this->gettext('moveto').":"));            
     $select = rcmail_mailbox_select(array('name' => '_folders', 'id' => 'folders'));    
     $table->add('title',  $select->show());
+    $table->add_row();
     
     # new option: all, read and unread messages
     $table->add('title', Q($this->gettext('messagecount').":"));
@@ -218,7 +222,7 @@ class filters extends rcube_plugin{
       }
       $messages = $saved_filter['messages'];  
                                  
-      $msg = $i." - ".$this->gettext('msg_if_field')." <b>".$this->gettext($saved_filter['whatfilter'])."</b> ".$this->gettext('msg_contains')." <b>".$saved_filter['searchstring']."</b> ".$this->gettext('msg_move_msg_in')." <b>".$folder_name."</b> "."(".$this->gettext('messagecount').": ".$this->gettext($saved_filter['messages']).")";        
+      $msg = $i." - ".$this->gettext('msg_if_field')." <b>".$this->gettext($saved_filter['whatfilter'])."</b> ".$this->gettext('msg_contains')." <b>".$saved_filter['searchstring']."</b> ".($saved_filter['casesensitive'] == '1' ? $this->gettext('msg_and_is')." <b>".$this->gettext('casesensitive')."</b> ": "").$this->gettext('msg_move_msg_in')." <b>".$folder_name."</b> "."(".$this->gettext('messagecount').": ".$this->gettext($saved_filter['messages']).")";        
       $table2->add('title',$msg);        
       $dlink = "<a href='./?_task=settings&_action=plugin.filters-delete&filterid=".$key."'>".$this->gettext('delete')."</a>";                
       $table2->add('title',$dlink);
@@ -352,6 +356,7 @@ class filters extends rcube_plugin{
       
       $searchstring = $this->rc->config->get('spam_subject', '***SPAM***');
       $destfolder = $this->rc->config->get('junk_mbox', null);
+	  $casesensitive = !$this->rc->config->get('caseInsensitiveSearch', true);
       $whatfilter = "subject"; 
       $messages = "all";
             
@@ -369,6 +374,7 @@ class filters extends rcube_plugin{
       if (!$found && $destfolder !== null && $destfolder !== ""){
         $new_arr['whatfilter'] = $whatfilter;
         $new_arr['searchstring'] = $searchstring;
+		$new_arr['casesensitive'] = $casesensitive ? '1' : '0';
         $new_arr['destfolder'] = $destfolder; 
         $new_arr['messages'] = $messages;     
         $arr_prefs = $user->get_prefs();                    
