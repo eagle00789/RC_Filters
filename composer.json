@@ -1,0 +1,29 @@
+{
+    "name": "roundcube/rcfilters",
+    "type": "roundcube-plugin",
+    "description": "This plugin adds the ability to create client side mail filters to move mail to folders  based on rules.",
+    "license": "GNU GPLv3",
+    "version": "2.1.4",
+    "authors": [
+        {
+            "name": "Ziba Scott",
+            "email": "ziba@umich.edu",
+            "role": "Lead"
+        },
+        {
+            "name": "Chris Simon",
+            "email": "info@decomputeur.nl",
+            "role": "Lead"
+        }
+    ],
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "http://plugins.roundcube.net"
+        }
+    ],
+    "require": {
+        "php": ">=5.2.1",
+        "roundcube/plugin-installer": ">=0.1.3"
+    }
+}
