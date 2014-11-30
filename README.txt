@@ -3,24 +3,24 @@
  *
  * Plugin that adds a new tab to the settings section to create client-side e-mail filtering.
  *
- * @version 2.1.2
+ * @version 2.1.4
  * @author Roberto Zarrelli <zarrelli@unimol.it>
+ * @author Chris Simon <info@decomputeur.nl> from version 2.1.3
  *  
  */
 
-
+Setup
+-----
 To install the plugin you have to: 
 1. copy the filters folder in the plugins folder of roundcube;
 2. add "filters" in the plugins section of the roundcube configuration (config/main.inc.php). 
 
-To setup the plugin, open the filters.php file and edit the following variables:
-  $this->autoAddSpamFilterRule = TRUE;  // if TRUE a spam filter rule is created for all users which automatically move messages into junk folder  
-  $this->spam_subject = '[SPAM]';       // How to mark the spam in the subject? To have effect the previous variable must be TRUE. 
-  $this->decodeBase64Msg = TRUE;        // if TRUE decodes base64 mail messages.
-  $this->caseInsensitiveSearch = TRUE;  // if TRUE filters searching in case insensitive mode.
+To setup the plugin, make a copy of the file config.inc.php.dist and save it as config.inc.php and make changes according to the directions in the configfile.
+If you do not make the required copy, or you do not make any changes in the copy, the script will automaticly create a spamfilter rule with the subject ***SPAM***, decode base64 messages and does a case insensitive search when a filter is being executed.
 
 
 History
+-------
 
 1.0 Initial version.
 1.1 Fixed some important issues.
@@ -54,4 +54,7 @@ History
   - Fixed a bug which prevented to insert case sensitive search strings - thanks to Emanuele Bruno.
 2.1.2:
   - Added a dynamic vertical scrollbar when there are a lot of filters to show - thanks to Alain Martini.      
-             
+2.1.3:
+  - Added a notification when the plugin caused 1 or more messages to be moved,
+2.1.4:
+  - Make use of some internal structures from roundcube for a config file to keep the plugin compatible with new versions of roundcube

@@ -1,0 +1,27 @@
+<?php
+
+/**
+ * Filters
+ *
+ * Plugin that adds a new tab to the settings section to create client-side e-mail filtering.
+ *
+ * @version 2.1.4
+ * @author Roberto Zarrelli <zarrelli@unimol.it>
+ * @author Chris Simon <info@decomputeur.nl> from version 2.1.3
+ */
+
+/***********************************************
+ * Filter plugin settings
+ ***********************************************/
+
+// if TRUE a spam filter rule is created for all users which automatically move messages into junk folder  
+$config['autoAddSpamFilterRule'] = TRUE;
+
+// How to mark the spam in the subject? To have effect the previous variable must be TRUE.
+$config['spam_subject'] = '***SPAM***';
+
+// if TRUE decodes base64 mail messages.
+$config['decodeBase64Msg'] = TRUE;
+
+// if TRUE filters searching in case insensitive mode.
+$config['caseInsensitiveSearch'] = TRUE;

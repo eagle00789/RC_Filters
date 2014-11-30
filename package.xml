@@ -10,11 +10,16 @@
 	<lead>
 		<name>Roberto Zarrelli</name>
 		<email>zarrelli@unimol.it</email>
+		<active>no</active>
+	</lead>
+	<lead>
+		<name>Chris Simon</name>
+		<email>info@decomputeur.nl</email>
 		<active>yes</active>
 	</lead>
-	<date>2013-10-30</date>
+	<date>2014-11-30</date>
 	<version>
-		<release>2.1.2</release>
+		<release>2.1.4</release>
 		<api>2.0</api>
 	</version>
 	<stability>

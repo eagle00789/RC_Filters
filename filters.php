@@ -5,8 +5,9 @@
  *
  * Plugin that adds a new tab to the settings section to create client-side e-mail filtering.
  *
- * @version 2.1.2 
+ * @version 2.1.4
  * @author Roberto Zarrelli <zarrelli@unimol.it> 
+ * @author Chris Simon <info@decomputeur.nl> from version 2.1.3
  *   
  */
 
@@ -14,56 +15,45 @@
 class filters extends rcube_plugin{
 
   public $task = 'login|mail|settings';   
-    
-  private $autoAddSpamFilterRule;   	
-	private $spam_subject;     
-  private $decodeBase64Msg;
-  private $caseInsensitiveSearch;
-
+  private $rc;    
   private $searchstring = array();    
   private $destfolder = array();
   private $msg_uids = array();    	    
   
     
-  function init(){    
-  
-    /* Filters parameters initialization. See readme.txt */
-    $this->autoAddSpamFilterRule = TRUE;
-    $this->spam_subject = '[SPAM]';
-    $this->decodeBase64Msg = TRUE;
-    $this->caseInsensitiveSearch = TRUE;    
-    /* ***************************************************** */
-    
-    $rcmail = rcmail::get_instance();    
-		if($rcmail->task == 'mail')           		  
+  function init(){
+    $this->rc = rcmail::get_instance();	
+	$this->load_config('config.inc.php.dist');
+	$this->load_config('config.inc.php');
+       
+		if($this->rc->task == 'mail')           		  
 			$this->add_hook('messages_list', array($this, 'filters_checkmsg'));		
-    else if ($rcmail->task == 'settings'){
+    else if ($this->rc->task == 'settings'){
         $this->register_action('plugin.filters', array($this, 'filters_init'));
         $this->register_action('plugin.filters-save', array($this, 'filters_save'));
         $this->register_action('plugin.filters-delete', array($this, 'filters_delete'));                 
         $this->add_texts('localization/', array('filters','nosearchstring'));       
-        $rcmail->output->add_label('filters');
+        $this->rc->output->add_label('filters');
         $this->include_script('filters.js');      
     }
-    else if ($rcmail->task == 'login'){
-      if ($this->autoAddSpamFilterRule)
+    else if ($this->rc->task == 'login'){
+      if ($this->rc->config->get('autoAddSpamFilterRule', true))
         $this->add_hook('login_after', array($this, 'filters_addMoveSpamRule'));
     }
   }  
     
   function filters_checkmsg($mlist){
 		$this->add_texts('localization/');
-		$rcmail = rcmail::get_instance();
-		$user = $rcmail->user;
-		$imap = $rcmail->imap;
+		$user = $this->rc->user;
+		$imap = $this->rc->imap;
 		$open_mbox = $imap->get_mailbox_name();								
 				
 		// does not consider the messages already in the trash
-    if ($open_mbox == $rcmail->config->get('trash_mbox'))
+    if ($open_mbox == $this->rc->config->get('trash_mbox'))
 		  return;
           		    
     //load filters
-    $arr_prefs = $rcmail->config->get('filters', array());
+    $arr_prefs = $this->rc->config->get('filters', array());
             
                         
     foreach ($arr_prefs as $key => $saved_filter){      
@@ -96,7 +86,7 @@ class filters extends rcube_plugin{
         }                          
         if (count($uids)){                    
 				  $imap->move_message($uids, $dfolder, $open_mbox);
-				  $rcmail->output->show_message($this->gettext('msg_moved_by_rule'), 'confirmation');
+				  $this->rc->output->show_message($this->gettext('msg_moved_by_rule'), 'confirmation');
         }                                  
       }            
       // refresh      
@@ -112,18 +102,16 @@ class filters extends rcube_plugin{
   function filters_init(){    
     $this->add_texts('localization/');
     $this->register_handler('plugin.body', array($this, 'filters_form'));    
-    $rcmail = rcmail::get_instance();
-    $rcmail->output->set_pagetitle($this->gettext('filters'));
-    $rcmail->output->send('plugin');    
+    $this->rc->output->set_pagetitle($this->gettext('filters'));
+    $this->rc->output->send('plugin');    
   }    
   
   function filters_save(){
-    $rcmail = rcmail::get_instance();
-    $user = $rcmail->user;
+    $user = $this->rc->user;
   
     $this->add_texts('localization/');
     $this->register_handler('plugin.body', array($this, 'filters_form'));
-    $rcmail->output->set_pagetitle($this->gettext('filters'));
+    $this->rc->output->set_pagetitle($this->gettext('filters'));
     
     $searchstring = trim(get_input_value('_searchstring', RCUBE_INPUT_POST, true));
     $destfolder = trim(get_input_value('_folders', RCUBE_INPUT_POST, true));
@@ -131,7 +119,7 @@ class filters extends rcube_plugin{
     $messages = trim(get_input_value('_messages', RCUBE_INPUT_POST, true));
     
     if ($searchstring == "")
-      $rcmail->output->command('display_message', $this->gettext('nosearchstring'), 'error');  
+      $this->rc->output->command('display_message', $this->gettext('nosearchstring'), 'error');  
     else{    
       $new_arr['whatfilter'] = $whatfilter;
       $new_arr['searchstring'] = htmlentities($searchstring);
@@ -140,21 +128,20 @@ class filters extends rcube_plugin{
       $arr_prefs = $user->get_prefs();                    
       $arr_prefs['filters'][] = $new_arr;
       if ($user->save_prefs($arr_prefs))
-        $rcmail->output->command('display_message', $this->gettext('successfullysaved'), 'confirmation');
+        $this->rc->output->command('display_message', $this->gettext('successfullysaved'), 'confirmation');
       else
-        $rcmail->output->command('display_message', $this->gettext('unsuccessfullysaved'), 'error');      
+        $this->rc->output->command('display_message', $this->gettext('unsuccessfullysaved'), 'error');      
     }
     rcmail_overwrite_action('plugin.filters');
-    $rcmail->output->send('plugin');    
+    $this->rc->output->send('plugin');    
   }
   
   function filters_delete(){
-    $rcmail = rcmail::get_instance();
-    $user = $rcmail->user;
+    $user = $this->rc->user;
 
     $this->add_texts('localization/');
     $this->register_handler('plugin.body', array($this, 'filters_form'));
-    $rcmail->output->set_pagetitle($this->gettext('filters'));
+    $this->rc->output->set_pagetitle($this->gettext('filters'));
     
     if (isset($_GET[filterid])){
       $filter_id = $_GET[filterid];      
@@ -162,20 +149,19 @@ class filters extends rcube_plugin{
       $arr_prefs['filters'][$filter_id] = '';      
       $arr_prefs['filters'] = array_diff($arr_prefs['filters'], array(''));
       if ($user->save_prefs($arr_prefs))
-        $rcmail->output->command('display_message', $this->gettext('successfullydeleted'), 'confirmation');
+        $this->rc->output->command('display_message', $this->gettext('successfullydeleted'), 'confirmation');
       else
-        $rcmail->output->command('display_message', $this->gettext('unsuccessfullydeleted'), 'error');
+        $this->rc->output->command('display_message', $this->gettext('unsuccessfullydeleted'), 'error');
     }
     
     rcmail_overwrite_action('plugin.filters');
-    $rcmail->output->send('plugin');      
+    $this->rc->output->send('plugin');      
   }    
       
 
   function filters_form(){
         		    
-    $rcmail = rcmail::get_instance();
-    $rcmail->imap_connect();
+    $this->rc->imap_connect();
   
     $table = new html_table(array('cols' => 2));
     $table->add('title', Q($this->gettext('whatfilter').":"));
@@ -204,14 +190,14 @@ class filters extends rcube_plugin{
     $table->add('', $select->show($this->gettext('all')));    
         
     // get mailbox list    
-    $a_folders = $rcmail->imap->list_mailboxes('', '*');
-    $delimiter = $rcmail->imap->get_hierarchy_delimiter();
+    $a_folders = $this->rc->imap->list_mailboxes('', '*');
+    $delimiter = $this->rc->imap->get_hierarchy_delimiter();
     $a_mailboxes = array();
     foreach ($a_folders as $folder)
       rcmail_build_folder_tree($a_mailboxes, $folder, $delimiter);    
     
     // load saved filters    
-    $user = $rcmail->user;    
+    $user = $this->rc->user;    
     $arr_prefs = $user->get_prefs();                    
     $i = 1;
     $flag=false;
@@ -247,7 +233,7 @@ class filters extends rcube_plugin{
         html::div(array('id' => 'prefs-title', 'class' => 'boxtitle'), $this->gettext('filters')) .
         html::div(array('class' => 'boxcontent'), $table->show() . 
         html::p(null,
-            $rcmail->output->button(array(
+            $this->rc->output->button(array(
                 'command' => 'plugin.filters-save',
                 'type' => 'input',
                 'class' => 'button mainaction',
@@ -258,9 +244,9 @@ class filters extends rcube_plugin{
      
         html::div(array('class' => 'boxcontent'), $table2->show() ));
     
-    $rcmail->output->add_gui_object('filtersform', 'filters-form');
+    $this->rc->output->add_gui_object('filtersform', 'filters-form');
     
-    return $rcmail->output->form_tag(array(
+    return $this->rc->output->form_tag(array(
         'id' => 'filters-form',
         'name' => 'filters-form',
         'method' => 'post',
@@ -325,7 +311,7 @@ class filters extends rcube_plugin{
   function filters_searchString($msg,$stringToSearch){
     $ret = FALSE;
     
-    $ciSearch = $this->caseInsensitiveSearch;
+    $ciSearch = $this->rc->config->get('caseInsensitiveSearch', true);
         
     if ($ciSearch){
       $tmp = stripos($msg, $stringToSearch);
@@ -338,7 +324,7 @@ class filters extends rcube_plugin{
       $ret = TRUE;
     }
     else{
-      if ($this->decodeBase64Msg === TRUE){
+      if ($this->rc->config->get('decodeBase64Msg', true) === TRUE){
         // decode and search BASE64 msg
         $decoded_str = base64_decode($msg);
         if ($decoded_str !== FALSE){
@@ -362,16 +348,15 @@ class filters extends rcube_plugin{
   
   function filters_addMoveSpamRule(){
     
-      $rcmail = rcmail::get_instance();
-      $user = $rcmail->user;
+      $user = $this->rc->user;
       
-      $searchstring = $this->spam_subject;
-      $destfolder = $rcmail->config->get('junk_mbox', null);
+      $searchstring = $this->rc->config->get('spam_subject', '***SPAM***');
+      $destfolder = $this->rc->config->get('junk_mbox', null);
       $whatfilter = "subject"; 
       $messages = "all";
             
       //load filters
-      $arr_prefs = $rcmail->config->get('filters', array());            
+      $arr_prefs = $this->rc->config->get('filters', array());            
             
       // check if the rule is already enabled  
       $found = false;                              
@@ -393,4 +378,3 @@ class filters extends rcube_plugin{
   }
       
 }
-
