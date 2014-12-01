@@ -3,7 +3,7 @@
     "type": "roundcube-plugin",
     "description": "This plugin adds the ability to create client side mail filters to move mail to folders  based on rules.",
     "license": "GNU GPLv3",
-    "version": "2.1.5",
+    "version": "2.1.6",
     "authors": [
         {
             "name": "Ziba Scott",

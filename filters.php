@@ -5,7 +5,7 @@
  *
  * Plugin that adds a new tab to the settings section to create client-side e-mail filtering.
  *
- * @version 2.1.5
+ * @version 2.1.6
  * @author Roberto Zarrelli <zarrelli@unimol.it> 
  * @author Chris Simon <info@decomputeur.nl> from version 2.1.3
  *   
@@ -59,7 +59,7 @@ class filters extends rcube_plugin{
       if ($saved_filter['destfolder'] != $open_mbox && $imap->mailbox_exists($saved_filter['destfolder'])){
         // destfolder#message filter
         $saved_filter['searchstring'] = html_entity_decode($saved_filter['searchstring']);
-        $this->searchstring[$saved_filter['whatfilter']][$saved_filter['searchstring']] = $saved_filter['destfolder']."#".$saved_filter['messages'];
+        $this->searchstring[$saved_filter['whatfilter']][$saved_filter['searchstring']] = $saved_filter['destfolder']."#".$saved_filter['messages']."#".$saved_filter['casesensitive'];
       }                    
     }
     
@@ -275,6 +275,7 @@ class filters extends rcube_plugin{
         $arr = explode("#",$dest);
         $destination = $arr[0];
         $msg_filter = $arr[1];
+		$caseSensitive = $arr[2];
                   
         if ($msg_filter != "all"){                    
           if ($msg_read && $msg_filter != "markread") continue;
@@ -298,23 +299,21 @@ class filters extends rcube_plugin{
             $field = "";            
         }                                
                             
-        if ($this->filters_searchString($field, $from) !== FALSE){            
+        if ($this->filters_searchString($field, $from, $caseSensitive) !== FALSE){            
           $this->msg_uids[$destination][] = $message->uid;            
           if (!in_array($destination, $this->destfolder))
             $this->destfolder[] = $destination;
         }
-                                
       }
-                    
     }
-        
   }
   
   
-  function filters_searchString($msg,$stringToSearch){
+  function filters_searchString($msg,$stringToSearch,$caseSensitive){
     $ret = FALSE;
     
-    $ciSearch = $this->rc->config->get('caseInsensitiveSearch', true);
+    $ciSearch = $caseSensitive == '1' ? true : false;
+	$ciSearch = !$ciSearch;
         
     if ($ciSearch){
       $tmp = stripos($msg, $stringToSearch);

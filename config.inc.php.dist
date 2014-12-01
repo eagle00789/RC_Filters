@@ -5,7 +5,7 @@
  *
  * Plugin that adds a new tab to the settings section to create client-side e-mail filtering.
  *
- * @version 2.1.5
+ * @version 2.1.6
  * @author Roberto Zarrelli <zarrelli@unimol.it>
  * @author Chris Simon <info@decomputeur.nl> from version 2.1.3
  */
@@ -23,5 +23,5 @@ $config['spam_subject'] = '***SPAM***';
 // if TRUE decodes base64 mail messages.
 $config['decodeBase64Msg'] = TRUE;
 
-// if TRUE filters searching in case insensitive mode.
+// if TRUE new filters searching default in case insensitive mode unless the filter specified otherwise.
 $config['caseInsensitiveSearch'] = TRUE;

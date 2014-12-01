@@ -60,3 +60,5 @@ History
   - Make use of some internal structures from roundcube for a config file to keep the plugin compatible with new versions of roundcube
 2.1.5:
   - Added the first hints of a per filter case sensitivity switch
+2.1.6:
+  - Finished the work on the case sensitive per filter option
