@@ -150,17 +150,8 @@ class filters extends rcube_plugin{
   }    
 
   function filters_init(){    
-    $this->rc->output->set_pagetitle($this->gettext('filters'));
-	$this->rc->output->include_script('list.js');
-//	$this->rc->output->add_label('deletefolderconfirm', 'purgefolderconfirm', 'folderdeleting',
-//		'foldermoving', 'foldersubscribing', 'folderunsubscribing', 'quota');
-//	$this->rc->output->add_handlers(array(
-//		'plugin.filters' => 'filters_form',
-//		'plugin.filterframe'        => 'filters_form',
-//	));
-	$this->rc->output->add_label('deleteidentityconfirm');
-    $this->rc->output->add_handler('identityframe', 'rcmail_identity_frame');
     $this->register_handler('plugin.body', array($this, 'filters_form'));    
+    $this->rc->output->set_pagetitle($this->gettext('filters'));
     $this->rc->output->send('plugin');    
   }    
   
