@@ -214,29 +214,33 @@ class filters extends rcube_plugin{
     $i = 1;
     $flag=false;
     $table2 = new html_table(array('cols' => 2));
-    foreach ($arr_prefs['filters'] as $key => $saved_filter){
-      $flag=true;
-      $folder_id = $saved_filter['destfolder'];
-      $folder_name = "";
-      if (strtoupper($folder_id) == 'INBOX')
-        $folder_name = rcube_label('inbox');
-      else{          
-        foreach ($a_mailboxes as $folder => $vet){
-          if ($vet['id'] == $folder_id){
-            $folder_name = $vet['name'];
-            break;
-          }
-        }
-      }
-      $messages = $saved_filter['messages'];  
-                                 
-      $msg = $i." - ".$this->gettext('msg_if_field')." <b>".$this->gettext($saved_filter['whatfilter'])."</b> ".$this->gettext('msg_contains')." <b>".$saved_filter['searchstring']."</b> ".($saved_filter['casesensitive'] == '1' ? $this->gettext('msg_and_is')." <b>".$this->gettext('casesensitive')."</b> ": "").$this->gettext('msg_move_msg_in')." <b>".$folder_name."</b> "."(".$this->gettext('messagecount').": ".$this->gettext($saved_filter['messages']).")";        
-      $table2->add('title',$msg);        
-      $dlink = "<a href='./?_task=settings&_action=plugin.filters-delete&filterid=".$key."'>".$this->gettext('delete')."</a>";                
-      $table2->add('title',$dlink);
-      $i++;      
-    } 
-
+    
+    //To prevent PHP Warning when no filter already set
+    if(!empty($arr_prefs['filters'])) {
+    	foreach ($arr_prefs['filters'] as $key => $saved_filter){
+      		$flag=true;
+	      	$folder_id = $saved_filter['destfolder'];
+	      	$folder_name = "";
+	      	if (strtoupper($folder_id) == 'INBOX')
+	        	$folder_name = rcube_label('inbox');
+	      	else{          
+	        	foreach ($a_mailboxes as $folder => $vet){
+	          		if ($vet['id'] == $folder_id){
+	            			$folder_name = $vet['name'];
+	            		break;
+	          		}
+	        	}
+	      	}
+	      	$messages = $saved_filter['messages'];  
+	                                 
+	      	$msg = $i." - ".$this->gettext('msg_if_field')." <b>".$this->gettext($saved_filter['whatfilter'])."</b> ".$this->gettext('msg_contains')." <b>".$saved_filter['searchstring']."</b> ".($saved_filter['casesensitive'] == '1' ? $this->gettext('msg_and_is')." <b>".$this->gettext('casesensitive')."</b> ": "").$this->gettext('msg_move_msg_in')." <b>".$folder_name."</b> "."(".$this->gettext('messagecount').": ".$this->gettext($saved_filter['messages']).")";        
+	      	$table2->add('title',$msg);        
+	      	$dlink = "<a href='./?_task=settings&_action=plugin.filters-delete&filterid=".$key."'>".$this->gettext('delete')."</a>";                
+	      	$table2->add('title',$dlink);
+	      	$i++;      
+    	} 
+    }
+    
     if (!$flag){
       $table2->add('title',Q($this->gettext('msg_no_stored_filters')));        
     }      
