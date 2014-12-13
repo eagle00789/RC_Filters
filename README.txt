@@ -62,3 +62,4 @@ History
   - Added the first hints of a per filter case sensitivity switch
 2.1.6:
   - Finished the work on the case sensitive per filter option
+  - Update filters.php (thanks to Pascal29) to prevent showing of php error when no filters are available
