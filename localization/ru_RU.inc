@@ -22,6 +22,6 @@ $messages['msg_if_field'] = 'Если поле';
 $messages['msg_contains'] = 'Содержит';
 $messages['msg_move_msg_in'] = 'Переместить сообщение в';
 $messages['msg_no_stored_filters'] = "Имеются не сохраненные правила.";
-$messages['msg_moved_by_rule'] = "Сообщение (ы) переехал фильтром (ы) ...";
+$messages['msg_moved_by_rule'] = "Письмо(а) перемещено фильтром...";
 
 ?>
