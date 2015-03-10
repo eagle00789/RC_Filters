@@ -211,7 +211,7 @@ class filters extends rcube_plugin{
         		    
     $this->rc->imap_connect();
   
-    $table = new html_table(array('cols' => 4));
+    $table = new html_table(array('cols' => 6));
 	
     $table->add('title', Q($this->gettext('whatfilter').":"));
     $select = new html_select(array('name' => '_whatfilter', 'id' => 'whatfilter'));
@@ -220,6 +220,14 @@ class filters extends rcube_plugin{
     $select->add($this->gettext('cc'), 'cc');
     $select->add($this->gettext('subject'), 'subject');
     $table->add('', $select->show($this->gettext('from')));
+    $table->add('', '&nbsp;');
+    $table->add('', '&nbsp;');
+    $table->add('', '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;');
+    // donation 
+    $table->add(array('rowspan'=>3),'More changes is to come. <br>
+									I also want to create an advanced filtering plugin, but that needs time and ... fuel ;)<br>
+									So please help by <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=KGEW4BDL6YJWS&lc=GB&item_name=RoundCubeFilters&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted" target="blank">donate</a>. Of course I will try to split donation between authors.
+									<br>Thanks');
     $table->add_row();
 
     $table->add('title', Q($this->gettext('searchstring').":"));
