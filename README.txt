@@ -3,10 +3,10 @@
  *
  * Plugin that adds a new tab to the settings section to create client-side e-mail filtering.
  *
- * @version 2.1.5
+ * @version 2.2.0
  * @author Roberto Zarrelli <zarrelli@unimol.it>
  * @author Chris Simon <info@decomputeur.nl> from version 2.1.3
- *  
+ * @author ByteFather <bytefather@gmail.com> from version 2.1.6
  */
 
 Setup
@@ -63,3 +63,9 @@ History
 2.1.6:
   - Finished the work on the case sensitive per filter option
   - Update filters.php (thanks to Pascal29) to prevent showing of php error when no filters are available
+2.1.7:
+  - Repaired encoding for filters search field and in that way proper recognition of phrase (with national characters)
+2.2.0:
+  - Added functionalities for setting filters order / sequence. 
+  - Added information where emails are moved (by filters), to which folder.
+
