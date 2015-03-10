@@ -5,9 +5,10 @@
  *
  * Plugin that adds a new tab to the settings section to create client-side e-mail filtering.
  *
- * @version 2.1.6
+ * @version 2.1.7
  * @author Roberto Zarrelli <zarrelli@unimol.it> 
  * @author Chris Simon <info@decomputeur.nl> from version 2.1.3
+ * @author Waldemar Chrapkowski (Gzom) <bytefather@gmail.com> from version 2.1.6
  *   
  */
  
@@ -311,7 +312,19 @@ class filters extends rcube_plugin{
           default:
             $field = "";            
         }                                
-                            
+        
+        // change encoding to UTF-8 - encoding repair 
+        if(preg_match("/=\?[a-zA-Z0-9\-]+\?/iU", $field)) { // search for string like: =?ISO-5899-2?
+			mb_internal_encoding("UTF-8");
+			$field = str_replace('_', ' ', $field); // moved before mb_decode_mimeheader(), to not to remove real (decoded) underscore
+			$field = mb_decode_mimeheader($field);
+		} else { // if there isn't encoding set, then try to recognize
+			$sEncoding = strtoupper(mb_detect_encoding($field, array('ISO-8859-1', 'UTF-8', 'Windows-1251', 'GB2312', 'windows-1252', 'iso-8859-2', 'iso-8859-5'), true)); // the most popular encodings on the internet 
+			if($sEncoding != 'UTF-8') {
+				$field = mb_convert_encoding($field, 'UTF-8', $sEncoding);
+			}
+		}
+		
         if ($this->filters_searchString($field, $from, $caseSensitive) !== FALSE){            
           $this->msg_uids[$destination][] = $message->uid;            
           if (!in_array($destination, $this->destfolder))
