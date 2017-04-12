@@ -3,7 +3,7 @@
  *
  * Plugin that adds a new tab to the settings section to create client-side e-mail filtering.
  *
- * @version 2.2.0
+ * @version 2.2.1
  * @author Roberto Zarrelli <zarrelli@unimol.it>
  * @author Chris Simon <info@decomputeur.nl> from version 2.1.3
  * @author ByteFather <bytefather@gmail.com> from version 2.1.6
@@ -68,4 +68,6 @@ History
 2.2.0:
   - Added functionalities for setting filters order / sequence. 
   - Added information where emails are moved (by filters), to which folder.
+2.2.1:
+  - Fixed for Roundcube 1.2.4
 
