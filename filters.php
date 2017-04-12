@@ -46,7 +46,7 @@ class filters extends rcube_plugin{
   function filters_checkmsg($mlist){
 		$user = $this->rc->user;
 		$imap = $this->rc->imap;
-		$open_mbox = $imap->get_mailbox_name();								
+		$open_mbox = $imap->get_folder();								
 				
 		// does not consider the messages already in the trash
     if ($open_mbox == $this->rc->config->get('trash_mbox'))
@@ -57,7 +57,7 @@ class filters extends rcube_plugin{
             
                         
     foreach ($arr_prefs as $key => $saved_filter){      
-      if ($saved_filter['destfolder'] != $open_mbox && $imap->mailbox_exists($saved_filter['destfolder'])){
+      if ($saved_filter['destfolder'] != $open_mbox && $imap->folder_exists($saved_filter['destfolder'])){
         // destfolder#message filter
         $saved_filter['searchstring'] = html_entity_decode($saved_filter['searchstring']);
         $this->searchstring[$saved_filter['whatfilter']][$saved_filter['searchstring']] = $saved_filter['destfolder']."#".$saved_filter['messages']."#".$saved_filter['casesensitive'];
@@ -209,7 +209,7 @@ class filters extends rcube_plugin{
   
   function filters_form(){
         		    
-    $this->rc->imap_connect();
+    $this->rc->storage_connect();
   
     $table = new html_table(array('cols' => 6));
 	
@@ -253,7 +253,7 @@ class filters extends rcube_plugin{
     $table->add('', $select->show($this->gettext('all')));    
         
     // get mailbox list    
-    $a_folders = $this->rc->imap->list_mailboxes('', '*');
+    $a_folders = $this->rc->imap->list_folders_subscribed('', '*');
     $delimiter = $this->rc->imap->get_hierarchy_delimiter();
     $a_mailboxes = array();
     foreach ($a_folders as $folder)
